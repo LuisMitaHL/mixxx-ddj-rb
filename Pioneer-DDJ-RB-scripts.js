@@ -5,7 +5,7 @@ var PioneerDDJRB = {};
 ///////////////////////////////////////////////////////////////
 
 // If true, vinyl mode will be enabled when Mixxx starts.
-PioneerDDJRB.vinylModeOnStartup = false;
+PioneerDDJRB.vinylModeOnStartup = true;
 
 // If true, pressing shift + cue will play the track in reverse and enable slip mode,
 // which can be used like a censor effect. If false, pressing shift + cue jumps to
@@ -13,11 +13,11 @@ PioneerDDJRB.vinylModeOnStartup = false;
 PioneerDDJRB.reverseRollOnShiftCue = false;
 
 // Sets the jogwheels sensitivity. 1 is default, 2 is twice as sensitive, 0.5 is half as sensitive.
-PioneerDDJRB.jogwheelSensitivity = 1.0;
+PioneerDDJRB.jogwheelSensitivity = 5.0;
 
 // Sets how much more sensitive the jogwheels get when holding shift.
 // Set to 1 to disable jogwheel sensitivity increase when holding shift.
-PioneerDDJRB.jogwheelShiftMultiplier = 100;
+PioneerDDJRB.jogwheelShiftMultiplier = 20;
 
 // If true Level-Meter shows VU-Master left & right. If false shows level of active deck.
 PioneerDDJRB.showVumeterMaster = false;
@@ -34,19 +34,16 @@ PioneerDDJRB.looprollIntervals = [1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2, 4, 8];
 
 /*
     Pioneer DDJ-RB mapping for Mixxx
+    Copyright (c) 2025 Luis Mita, licensed under GPL version 2 or later
     Copyright (c) 2017 Be (be.0@gmx.com), licensed under GPL version 2 or later
     Copyright (c) 2014-2015 various contributors, licensed under MIT license
 
     Contributors and change log:
-    - Be (be.0@gmx.com): update effects and autoloop mode for Mixxx 2.1, fix level meter scaling,
-      remove LED flickering when pressing shift, start porting to Components
-    - Michael Stahl (DG3NEC): original DDJ-SB2 mapping for Mixxx 2.0
-    - Joan Ardiaca Jové (joan.ardiaca@gmail.com): Pioneer DDJ-SB mapping for Mixxx 2.0
-    - wingcom (wwingcomm@gmail.com): start of Pioneer DDJ-SB mapping
-      https://github.com/wingcom/Mixxx-Pioneer-DDJ-SB
-    - Hilton Rudham: Pioneer DDJ-SR mapping
-      https://github.com/hrudham/Mixxx-Pioneer-DDJ-SR
+    - Fix Loop Buttons, Effect Knobs and Jog Wheel
+    - Imported from DDJ-SB3 template
 
+    TODO:
+    - Delete references to Deck 3 and Deck 4 (not available on DDJ-RB)
 */
 
 PioneerDDJRB.PadMode = {
@@ -765,6 +762,20 @@ PioneerDDJRB.beatloopRollButtons = function(channel, control, value, status, gro
     );
 };
 
+PioneerDDJRB.loopInButton = function(channel, control, value, status, group) {
+    engine.setValue(PioneerDDJRB.deckSwitchTable[group], 'loop_in', value ? 1 : 0);
+};
+
+PioneerDDJRB.loopOutButton = function(channel, control, value, status, group) {
+    engine.setValue(PioneerDDJRB.deckSwitchTable[group], 'loop_out', value ? 1 : 0);
+};
+
+PioneerDDJRB.loopExitButton = function(channel, control, value, status, group) {
+    if (value) {
+        engine.setValue(PioneerDDJRB.deckSwitchTable[group], 'reloop_exit', 1);
+    }
+};
+
 PioneerDDJRB.vinylButton = function(channel, control, value, status, group) {
     PioneerDDJRB.toggleScratch(channel, control, value, status, group);
 };
@@ -1184,14 +1195,14 @@ PioneerDDJRB.jogPlatterTick = function(channel, control, value, status, group) {
 
 PioneerDDJRB.jogPlatterTickShift = function(channel, control, value, status, group) {
     var deck = PioneerDDJRB.channelGroups[PioneerDDJRB.deckSwitchTable[group]];
-    if (PioneerDDJRB.scratchMode[deck]) {
+    /*if (PioneerDDJRB.scratchMode[deck]) {
         engine.scratchTick(deck + 1, PioneerDDJRB.getJogWheelDelta(value));
-    } else {
+    } else {*/
         PioneerDDJRB.pitchBendFromJog(
             PioneerDDJRB.deckSwitchTable[group],
             PioneerDDJRB.getJogWheelDelta(value) * PioneerDDJRB.jogwheelShiftMultiplier
         );
-    }
+    /*}*/
 };
 
 PioneerDDJRB.jogTouch = function(channel, control, value, status, group) {
