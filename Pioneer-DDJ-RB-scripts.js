@@ -1358,6 +1358,98 @@ PioneerDDJRB.EffectUnit.prototype.setShift = function(value) {
     }
 };
 
+PioneerDDJRB.fxUnit1Effect1MetaDecrease = function(channel, control, value) {
+    if (value) {
+        if (PioneerDDJRB.effectMetaTimerDecrease) {
+            engine.stopTimer(PioneerDDJRB.effectMetaTimerDecrease);
+        }
+        if (PioneerDDJRB.effectMetaTimerIncrease) {
+            engine.stopTimer(PioneerDDJRB.effectMetaTimerIncrease);
+            PioneerDDJRB.effectMetaTimerIncrease = null;
+        }
+        var step = function() {
+            var current = engine.getParameter("[EffectRack1_EffectUnit1_Effect1]", "meta");
+            engine.setParameter("[EffectRack1_EffectUnit1_Effect1]", "meta", Math.max(0, current - 0.05));
+        };
+        step();
+        PioneerDDJRB.effectMetaTimerDecrease = engine.beginTimer(150, step);
+    } else {
+        if (PioneerDDJRB.effectMetaTimerDecrease) {
+            engine.stopTimer(PioneerDDJRB.effectMetaTimerDecrease);
+            PioneerDDJRB.effectMetaTimerDecrease = null;
+        }
+    }
+};
+
+PioneerDDJRB.fxUnit1Effect1MetaIncrease = function(channel, control, value) {
+    if (value) {
+        if (PioneerDDJRB.effectMetaTimerIncrease) {
+            engine.stopTimer(PioneerDDJRB.effectMetaTimerIncrease);
+        }
+        if (PioneerDDJRB.effectMetaTimerDecrease) {
+            engine.stopTimer(PioneerDDJRB.effectMetaTimerDecrease);
+            PioneerDDJRB.effectMetaTimerDecrease = null;
+        }
+        var step = function() {
+            var current = engine.getParameter("[EffectRack1_EffectUnit1_Effect1]", "meta");
+            engine.setParameter("[EffectRack1_EffectUnit1_Effect1]", "meta", Math.min(1, current + 0.05));
+        };
+        step();
+        PioneerDDJRB.effectMetaTimerIncrease = engine.beginTimer(150, step);
+    } else {
+        if (PioneerDDJRB.effectMetaTimerIncrease) {
+            engine.stopTimer(PioneerDDJRB.effectMetaTimerIncrease);
+            PioneerDDJRB.effectMetaTimerIncrease = null;
+        }
+    }
+};
+
+PioneerDDJRB.fxUnit2Effect1MetaDecrease = function(channel, control, value) {
+    if (value) {
+        if (PioneerDDJRB.effect2MetaTimerDecrease) {
+            engine.stopTimer(PioneerDDJRB.effect2MetaTimerDecrease);
+        }
+        if (PioneerDDJRB.effect2MetaTimerIncrease) {
+            engine.stopTimer(PioneerDDJRB.effect2MetaTimerIncrease);
+            PioneerDDJRB.effect2MetaTimerIncrease = null;
+        }
+        var step = function() {
+            var current = engine.getParameter("[EffectRack1_EffectUnit2_Effect1]", "meta");
+            engine.setParameter("[EffectRack1_EffectUnit2_Effect1]", "meta", Math.max(0, current - 0.05));
+        };
+        step();
+        PioneerDDJRB.effect2MetaTimerDecrease = engine.beginTimer(150, step);
+    } else {
+        if (PioneerDDJRB.effect2MetaTimerDecrease) {
+            engine.stopTimer(PioneerDDJRB.effect2MetaTimerDecrease);
+            PioneerDDJRB.effect2MetaTimerDecrease = null;
+        }
+    }
+};
+
+PioneerDDJRB.fxUnit2Effect1MetaIncrease = function(channel, control, value) {
+    if (value) {
+        if (PioneerDDJRB.effect2MetaTimerIncrease) {
+            engine.stopTimer(PioneerDDJRB.effect2MetaTimerIncrease);
+        }
+        if (PioneerDDJRB.effect2MetaTimerDecrease) {
+            engine.stopTimer(PioneerDDJRB.effect2MetaTimerDecrease);
+            PioneerDDJRB.effect2MetaTimerDecrease = null;
+        }
+        var step = function() {
+            var current = engine.getParameter("[EffectRack1_EffectUnit2_Effect1]", "meta");
+            engine.setParameter("[EffectRack1_EffectUnit2_Effect1]", "meta", Math.min(1, current + 0.05));
+        };
+        step();
+        PioneerDDJRB.effect2MetaTimerIncrease = engine.beginTimer(150, step);
+    } else {
+        if (PioneerDDJRB.effect2MetaTimerIncrease) {
+            engine.stopTimer(PioneerDDJRB.effect2MetaTimerIncrease);
+            PioneerDDJRB.effect2MetaTimerIncrease = null;
+        }
+    }
+};
+
 ///////////////////////////////////////////////////////////////
 //                             SLICER                        //
 ///////////////////////////////////////////////////////////////

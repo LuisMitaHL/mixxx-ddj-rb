@@ -866,6 +866,26 @@
         </options>
       </control>
       <control>
+        <group>[EffectRack1_EffectUnit2_Effect1]</group>
+        <key>PioneerDDJRB.fxUnit2Effect1MetaDecrease</key>
+        <description>FX2 Effect1 meta decrease, Button: right FX2 minus</description>
+        <status>0x95</status>
+        <midino>0x4A</midino>
+        <options>
+          <script-binding />
+        </options>
+      </control>
+      <control>
+        <group>[EffectRack1_EffectUnit2_Effect1]</group>
+        <key>PioneerDDJRB.fxUnit2Effect1MetaIncrease</key>
+        <description>FX2 Effect1 meta increase, Button: right FX2 plus</description>
+        <status>0x95</status>
+        <midino>0x4B</midino>
+        <options>
+          <script-binding />
+        </options>
+      </control>
+      <control>
         <group>[EffectRack1_EffectUnit2]</group>
         <key>PioneerDDJRB.effectUnit[2].knob.inputMSB</key>
         <description>FX2 (MSB), Knob: right FX2</description>
@@ -1204,7 +1224,27 @@
         <options>
           <script-binding />
         </options>
-        </control>
+      </control>
+      <control>
+        <group>[EffectRack1_EffectUnit1_Effect1]</group>
+        <key>PioneerDDJRB.fxUnit1Effect1MetaDecrease</key>
+        <description>FX1 Effect1 meta decrease, Button: left FX1 minus</description>
+        <status>0x94</status>
+        <midino>0x4A</midino>
+        <options>
+          <script-binding />
+        </options>
+      </control>
+      <control>
+        <group>[EffectRack1_EffectUnit1_Effect1]</group>
+        <key>PioneerDDJRB.fxUnit1Effect1MetaIncrease</key>
+        <description>FX1 Effect1 meta increase, Button: left FX1 plus</description>
+        <status>0x94</status>
+        <midino>0x4B</midino>
+        <options>
+          <script-binding />
+        </options>
+      </control>
       <control>
         <group>[Channel1]</group>
         <key>PioneerDDJRB.loopOutButton</key>
