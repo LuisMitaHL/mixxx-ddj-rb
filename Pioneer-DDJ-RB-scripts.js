@@ -43,7 +43,7 @@ PioneerDDJRB.looprollIntervals = [1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2, 4, 8];
     - Imported from DDJ-SB3 template
 
     TODO:
-    - Delete references to Deck 3 and Deck 4 (not available on DDJ-RB)
+    - Test all controls on DDJ-RB hardware
 */
 
 PioneerDDJRB.PadMode = {
@@ -73,23 +73,7 @@ PioneerDDJRB.trackLoaded = function(value, group) {
 // When unloading a deck, it should pass 0 for BPM
 //
 // Controller should know track BPM to match the TRANS pads velocity
-// Also, changing deck without sending BPM does not work
 PioneerDDJRB.updateBPM = function(bpm, group) {
-    // Prevent sending BPM for unselected Deck.
-    // We send it when changing deck also, to keep in sync
-    if (group === "[Channel1]" && PioneerDDJRB.deck3Enabled) {
-        return;
-    }
-    if (group === "[Channel2]" && PioneerDDJRB.deck4Enabled) {
-        return;
-    }
-    if (group === "[Channel3]" && !PioneerDDJRB.deck3Enabled) {
-        return;
-    }
-    if (group === "[Channel4]" && !PioneerDDJRB.deck4Enabled) {
-        return;
-    }
-
     var bpmValue = Math.round(bpm * 100);
     var bpmBits = bpmValue.toString(2);
 
@@ -172,20 +156,18 @@ PioneerDDJRB.scratchSettings = {
 
 PioneerDDJRB.channelGroups = {
     "[Channel1]": 0x00,
-    "[Channel2]": 0x01,
-    "[Channel3]": 0x02,
-    "[Channel4]": 0x03
+    "[Channel2]": 0x01
 };
 
 PioneerDDJRB.samplerGroups = {
-    "[Sampler1]": {channels: ["[Channel1]", "[Channel3]"], ledNumber: 0x00},
-    "[Sampler2]": {channels: ["[Channel1]", "[Channel3]"], ledNumber: 0x01},
-    "[Sampler3]": {channels: ["[Channel1]", "[Channel3]"], ledNumber: 0x02},
-    "[Sampler4]": {channels: ["[Channel1]", "[Channel3]"], ledNumber: 0x03},
-    "[Sampler5]": {channels: ["[Channel2]", "[Channel4]"], ledNumber: 0x00},
-    "[Sampler6]": {channels: ["[Channel2]", "[Channel4]"], ledNumber: 0x01},
-    "[Sampler7]": {channels: ["[Channel2]", "[Channel4]"], ledNumber: 0x02},
-    "[Sampler8]": {channels: ["[Channel2]", "[Channel4]"], ledNumber: 0x03},
+    "[Sampler1]": {channels: ["[Channel1]"], ledNumber: 0x00},
+    "[Sampler2]": {channels: ["[Channel1]"], ledNumber: 0x01},
+    "[Sampler3]": {channels: ["[Channel1]"], ledNumber: 0x02},
+    "[Sampler4]": {channels: ["[Channel1]"], ledNumber: 0x03},
+    "[Sampler5]": {channels: ["[Channel2]"], ledNumber: 0x00},
+    "[Sampler6]": {channels: ["[Channel2]"], ledNumber: 0x01},
+    "[Sampler7]": {channels: ["[Channel2]"], ledNumber: 0x02},
+    "[Sampler8]": {channels: ["[Channel2]"], ledNumber: 0x03},
 };
 
 PioneerDDJRB.ledGroups = {
@@ -215,16 +197,12 @@ PioneerDDJRB.nonPadLeds = {
 
 PioneerDDJRB.channelsToPadNumber = {
     "[Channel1]": 1,
-    "[Channel2]": 2,
-    "[Channel3]": 3,
-    "[Channel4]": 4
+    "[Channel2]": 2
 };
 
 PioneerDDJRB.channelsToEffectUnitNumber = {
     "[Channel1]": 1,
-    "[Channel2]": 2,
-    "[Channel3]": 1,
-    "[Channel4]": 2
+    "[Channel2]": 2
 };
 
 PioneerDDJRB.init = function() {
@@ -238,17 +216,13 @@ PioneerDDJRB.init = function() {
         null
     ];
 
-    PioneerDDJRB.scratchMode = [false, false, false, false];
+    PioneerDDJRB.scratchMode = [false, false];
 
     PioneerDDJRB.valueVuMeter = {
         "[Channel1]_current": 0,
         "[Channel2]_current": 0,
-        "[Channel3]_current": 0,
-        "[Channel4]_current": 0,
         "[Channel1]_enabled": 1,
         "[Channel2]_enabled": 1,
-        "[Channel3]_enabled": 1,
-        "[Channel4]_enabled": 1,
     };
 
     if (engine.getValue("[App]", "num_samplers") < 8) {
@@ -258,8 +232,6 @@ PioneerDDJRB.init = function() {
     PioneerDDJRB.deck = [];
     PioneerDDJRB.deck[1] = new PioneerDDJRB.Deck(1);
     PioneerDDJRB.deck[2] = new PioneerDDJRB.Deck(2);
-    PioneerDDJRB.deck[3] = new PioneerDDJRB.Deck(3);
-    PioneerDDJRB.deck[4] = new PioneerDDJRB.Deck(4);
 
     PioneerDDJRB.effectUnit = [];
     PioneerDDJRB.effectUnit[1] = new PioneerDDJRB.EffectUnit(1);
@@ -268,14 +240,10 @@ PioneerDDJRB.init = function() {
     PioneerDDJRB.padForDeck = [];
     PioneerDDJRB.padForDeck[1] = new PioneerDDJRB.Pad(1);
     PioneerDDJRB.padForDeck[2] = new PioneerDDJRB.Pad(2);
-    PioneerDDJRB.padForDeck[3] = new PioneerDDJRB.Pad(3);
-    PioneerDDJRB.padForDeck[4] = new PioneerDDJRB.Pad(4);
 
     PioneerDDJRB.bindNonDeckControlConnections(false);
     PioneerDDJRB.initDeck("[Channel1]");
     PioneerDDJRB.initDeck("[Channel2]");
-    PioneerDDJRB.initDeck("[Channel3]");
-    PioneerDDJRB.initDeck("[Channel4]");
 
     if (PioneerDDJRB.twinkleVumeterAutodjOn) {
         PioneerDDJRB.vuMeterTimer = engine.beginTimer(100, PioneerDDJRB.vuMeterTwinkle);
@@ -334,9 +302,6 @@ PioneerDDJRB.Deck = function(deckNumber) {
     });
 
     var effectUnitNumber = deckNumber;
-    if (deckNumber > 2) {
-        effectUnitNumber -= 2;
-    }
 
     // The Mixxx UI call this Gain, but on the controller the knob is labeled TRIM
     this.gainKnob = new components.Pot({
@@ -553,7 +518,7 @@ PioneerDDJRB.shutdown = function() {
     midi.sendShortMsg(0x91, 0x72, 0x7f);
 
     // turn off level meters
-    for (channel = 0; channel <= 3; channel++) {
+    for (channel = 0; channel <= 1; channel++) {
         midi.sendShortMsg(0xB0 + channel, 2, 0);
     }
 
@@ -579,33 +544,23 @@ PioneerDDJRB.vuMeterTwinkle = function() {
         }
         if (PioneerDDJRB.blinkAutodjState === 0) {
             PioneerDDJRB.valueVuMeter["[Channel1]_enabled"] = 0;
-            PioneerDDJRB.valueVuMeter["[Channel3]_enabled"] = 0;
             PioneerDDJRB.valueVuMeter["[Channel2]_enabled"] = 0;
-            PioneerDDJRB.valueVuMeter["[Channel4]_enabled"] = 0;
         }
         if (PioneerDDJRB.blinkAutodjState === 1) {
             PioneerDDJRB.valueVuMeter["[Channel1]_enabled"] = 1;
-            PioneerDDJRB.valueVuMeter["[Channel3]_enabled"] = 1;
             PioneerDDJRB.valueVuMeter["[Channel2]_enabled"] = 0;
-            PioneerDDJRB.valueVuMeter["[Channel4]_enabled"] = 0;
         }
         if (PioneerDDJRB.blinkAutodjState === 2) {
             PioneerDDJRB.valueVuMeter["[Channel1]_enabled"] = 1;
-            PioneerDDJRB.valueVuMeter["[Channel3]_enabled"] = 1;
             PioneerDDJRB.valueVuMeter["[Channel2]_enabled"] = 1;
-            PioneerDDJRB.valueVuMeter["[Channel4]_enabled"] = 1;
         }
         if (PioneerDDJRB.blinkAutodjState === 3) {
             PioneerDDJRB.valueVuMeter["[Channel1]_enabled"] = 0;
-            PioneerDDJRB.valueVuMeter["[Channel3]_enabled"] = 0;
             PioneerDDJRB.valueVuMeter["[Channel2]_enabled"] = 1;
-            PioneerDDJRB.valueVuMeter["[Channel4]_enabled"] = 1;
         }
     } else {
         PioneerDDJRB.valueVuMeter["[Channel1]_enabled"] = 1;
-        PioneerDDJRB.valueVuMeter["[Channel3]_enabled"] = 1;
         PioneerDDJRB.valueVuMeter["[Channel2]_enabled"] = 1;
-        PioneerDDJRB.valueVuMeter["[Channel4]_enabled"] = 1;
     }
 };
 
@@ -679,8 +634,6 @@ PioneerDDJRB.bindNonDeckControlConnections = function(isUnbinding) {
     } else {
         engine.connectControl("[Channel1]", "vu_meter", PioneerDDJRB.VuMeterLeds, isUnbinding);
         engine.connectControl("[Channel2]", "vu_meter", PioneerDDJRB.VuMeterLeds, isUnbinding);
-        engine.connectControl("[Channel3]", "vu_meter", PioneerDDJRB.VuMeterLeds, isUnbinding);
-        engine.connectControl("[Channel4]", "vu_meter", PioneerDDJRB.VuMeterLeds, isUnbinding);
     }
 };
 
@@ -690,18 +643,9 @@ PioneerDDJRB.bindNonDeckControlConnections = function(isUnbinding) {
 
 PioneerDDJRB.deckSwitchTable = {
     "[Channel1]": "[Channel1]",
-    "[Channel2]": "[Channel2]",
-    "[Channel3]": "[Channel3]",
-    "[Channel4]": "[Channel4]"
-
+    "[Channel2]": "[Channel2]"
 };
 
-PioneerDDJRB.deckShiftSwitchTable = {
-    "[Channel1]": "[Channel3]",
-    "[Channel2]": "[Channel4]",
-    "[Channel3]": "[Channel1]",
-    "[Channel4]": "[Channel2]"
-};
 
 PioneerDDJRB.initDeck = function(group) {
     PioneerDDJRB.bindDeckControlConnections(group, false);
@@ -716,9 +660,7 @@ PioneerDDJRB.initDeck = function(group) {
 
 PioneerDDJRB.highResMSB = {
     "[Channel1]": {},
-    "[Channel2]": {},
-    "[Channel3]": {},
-    "[Channel4]": {}
+    "[Channel2]": {}
 };
 
 PioneerDDJRB.deckFaderMSB = function(channel, control, value, status, group) {
@@ -813,7 +755,6 @@ PioneerDDJRB.shiftKeyLockButton = function(channel, control, value, status, grou
 
 PioneerDDJRB.deck1Button = function(channel, control, value, status, group) {
     if (value) {
-        PioneerDDJRB.deck3Enabled = false;
         var bpm = engine.getValue(group, "bpm");
         PioneerDDJRB.updateBPM(bpm, group);
         midi.sendShortMsg(0xB0, 0x02, 0x0);
@@ -822,28 +763,9 @@ PioneerDDJRB.deck1Button = function(channel, control, value, status, group) {
 
 PioneerDDJRB.deck2Button = function(channel, control, value, status, group) {
     if (value) {
-        PioneerDDJRB.deck4Enabled = false;
         var bpm = engine.getValue(group, "bpm");
         PioneerDDJRB.updateBPM(bpm, group);
         midi.sendShortMsg(0xB1, 0x02, 0x0);
-    }
-};
-
-PioneerDDJRB.deck3Button = function(channel, control, value, status, group) {
-    if (value) {
-        PioneerDDJRB.deck3Enabled = true;
-        midi.sendShortMsg(0xB2, 0x02, 0x0);
-        var bpm = engine.getValue(group, "bpm");
-        PioneerDDJRB.updateBPM(bpm, group);
-    }
-};
-
-PioneerDDJRB.deck4Button = function(channel, control, value, status, group) {
-    if (value) {
-        PioneerDDJRB.deck4Enabled = true;
-        var bpm = engine.getValue(group, "bpm");
-        PioneerDDJRB.updateBPM(bpm, group);
-        midi.sendShortMsg(0xB3, 0x02, 0x0);
     }
 };
 
@@ -889,18 +811,11 @@ PioneerDDJRB.headphoneCueButton = function(channel, control, value, status, grou
     }
 };
 
-PioneerDDJRB.headphoneShiftCueButton = function(channel, control, value, status, group) {
-    if (value) {
-        script.toggleControl(PioneerDDJRB.deckShiftSwitchTable[group], "pfl");
-        PioneerDDJRB.headphoneMasterUpdate();
-    }
-};
-
 PioneerDDJRB.headphoneMasterUpdate = function() {
     var anyDeckCue = false;
     var masterCue = PioneerDDJRB.headphoneCueMaster;
 
-    for (var i = 1; i <= 4; i++) {
+    for (var i = 1; i <= 2; i++) {
         if (engine.getValue("[Channel" + i + "]", "pfl")) {
             anyDeckCue = true;
         }
@@ -1084,8 +999,6 @@ PioneerDDJRB.beatlooprollLeds = function(value, group, control) {
 PioneerDDJRB.hotCueLedStates = {
     "[Channel1]": {states: {}, isShifted: false},
     "[Channel2]": {states: {}, isShifted: false},
-    "[Channel3]": {states: {}, isShifted: false},
-    "[Channel4]": {states: {}, isShifted: false},
 };
 
 PioneerDDJRB.hotCueLeds = function(value, group, control) {
@@ -1124,10 +1037,7 @@ PioneerDDJRB.VuMeterLeds = function(value, group, control) {
             } else if (control === "vu_meter_right") {
                 midiChannel = 1;
             }
-            // Send for deck 1 or 2
             midi.sendShortMsg(0xB0 + midiChannel, 2, value);
-            // Send for deck 3 or 4
-            midi.sendShortMsg(0xB0 + midiChannel + 2, 2, value);
         } else {
             midiChannel = parseInt(group.substring(8, 9) - 1);
             midi.sendShortMsg(0xB0 + midiChannel, 2, value);
@@ -1136,16 +1046,14 @@ PioneerDDJRB.VuMeterLeds = function(value, group, control) {
         if (group === "[Master]") {
             if (control === "vu_meter_left") {
                 PioneerDDJRB.valueVuMeter["[Channel1]_current"] = value;
-                PioneerDDJRB.valueVuMeter["[Channel3]_current"] = value;
             } else {
                 PioneerDDJRB.valueVuMeter["[Channel2]_current"] = value;
-                PioneerDDJRB.valueVuMeter["[Channel4]_current"] = value;
             }
         } else {
             PioneerDDJRB.valueVuMeter[group + "_current"] = value;
         }
 
-        for (var channel = 0; channel < 4; channel++) {
+        for (var channel = 0; channel < 2; channel++) {
             var midiOut = PioneerDDJRB.valueVuMeter["[Channel" + (channel + 1) + "]_current"];
             if (PioneerDDJRB.valueVuMeter["[Channel" + (channel + 1) + "]_enabled"]) {
                 midiOut = 0;
