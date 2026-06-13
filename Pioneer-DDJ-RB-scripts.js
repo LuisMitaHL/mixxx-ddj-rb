@@ -193,6 +193,8 @@ PioneerDDJRB.nonPadLeds = {
     "shiftSync": 0x5C,
     "autoLoop": 0x14,
     "shiftAutoLoop": 0x50,
+    "loopIn": 0x10,
+    "loopOut": 0x11,
 };
 
 PioneerDDJRB.channelsToPadNumber = {
@@ -952,6 +954,8 @@ PioneerDDJRB.slipLed = function(value, group) {
 
 PioneerDDJRB.autoLoopLed = function(value, group) {
     PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.autoLoop, value);
+    PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.loopIn, value);
+    PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.loopOut, value);
 };
 
 PioneerDDJRB.samplerLedsDuration = function(value, group) {
