@@ -197,6 +197,11 @@ PioneerDDJRB.nonPadLeds = {
     "loopOut": 0x11,
 };
 
+PioneerDDJRB.loopInBlinking = {
+    "[Channel1]": false,
+    "[Channel2]": false,
+};
+
 PioneerDDJRB.channelsToPadNumber = {
     "[Channel1]": 1,
     "[Channel2]": 2
@@ -253,6 +258,16 @@ PioneerDDJRB.init = function() {
 
     // request the positions of the knobs and faders from the controller
     midi.sendShortMsg(0x9B, 0x09, 0x7f);
+
+    PioneerDDJRB.flasher.addFunction(function(flag) {
+        for (var i = 1; i <= 2; i++) {
+            var group = "[Channel" + i + "]";
+            if (PioneerDDJRB.loopInBlinking[group] && !engine.getValue(group, "loop_enabled")) {
+                PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.loopIn, flag);
+                PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.loopOut, false);
+            }
+        }
+    });
 
     PioneerDDJRB.flasher.init();
     PioneerDDJRB.initFlashingPadLedControl();
@@ -651,6 +666,12 @@ PioneerDDJRB.deckSwitchTable = {
 
 PioneerDDJRB.initDeck = function(group) {
     PioneerDDJRB.bindDeckControlConnections(group, false);
+    engine.makeConnection(group, "loop_start_position", function() {
+        PioneerDDJRB.updateLoopLedBlink(group);
+    });
+    engine.makeConnection(group, "loop_end_position", function() {
+        PioneerDDJRB.updateLoopLedBlink(group);
+    });
     PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.shiftKeyLock, PioneerDDJRB.channelGroups[group] > 1);
     PioneerDDJRB.toggleScratch(null, null, PioneerDDJRB.vinylModeOnStartup, null, group);
 };
@@ -956,6 +977,16 @@ PioneerDDJRB.autoLoopLed = function(value, group) {
     PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.autoLoop, value);
     PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.loopIn, value);
     PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.loopOut, value);
+};
+
+PioneerDDJRB.updateLoopLedBlink = function(group) {
+    var startPos = engine.getValue(group, "loop_start_position");
+    var loopEnabled = engine.getValue(group, "loop_enabled");
+    var trackLoaded = engine.getValue(group, "track_loaded");
+    PioneerDDJRB.loopInBlinking[group] = (trackLoaded && startPos !== -1 && !loopEnabled);
+    if (PioneerDDJRB.loopInBlinking[group]) {
+        PioneerDDJRB.nonPadLedControl(group, PioneerDDJRB.nonPadLeds.loopOut, false);
+    }
 };
 
 PioneerDDJRB.samplerLedsDuration = function(value, group) {
